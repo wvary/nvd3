@@ -164,6 +164,7 @@ nv.models.discreteBar = function() {
                     .watchTransition(renderWatch, 'discreteBar: bars text')
                     .attr('x', x.rangeBand() * .9 / 2)
                     .attr('y', function(d,i) { return getY(d,i) < 0 ? y(getY(d,i)) - y(0) + 12 : -4 })
+
                 ;
             } else {
                 bars.selectAll('text').remove();

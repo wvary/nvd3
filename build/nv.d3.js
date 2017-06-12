@@ -2469,7 +2469,7 @@ nv.models.boxPlotChart = function() {
                 if (staggerLabels) {
                     xTicks
                         .selectAll('text')
-                        .attr('transform', function(d,i,j) { return 'translate(0,' + (j % 2 === 0 ? '2' : '18') + ')' })
+                        .attr('transform', function(d,i,j) { return 'translate(0,' + (j % 2 === 0 ? '5' : '17') + ')' })
                 }
             }
 
@@ -4145,6 +4145,7 @@ nv.models.discreteBar = function() {
                     .watchTransition(renderWatch, 'discreteBar: bars text')
                     .attr('x', x.rangeBand() * .9 / 2)
                     .attr('y', function(d,i) { return getY(d,i) < 0 ? y(getY(d,i)) - y(0) + 12 : -4 })
+
                 ;
             } else {
                 bars.selectAll('text').remove();
@@ -11419,6 +11420,7 @@ nv.models.pie = function() {
                 , arcsRadiusInner = []
                 , that = this
                 ;
+
             container = d3.select(this)
             if (arcsRadius.length === 0) {
                 var outer = radius - radius / 10;

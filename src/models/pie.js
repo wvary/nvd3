@@ -53,6 +53,7 @@ nv.models.pie = function() {
                 , arcsRadiusInner = []
                 , that = this
                 ;
+
             container = d3.select(this)
             if (arcsRadius.length === 0) {
                 var outer = radius - radius / 10;
