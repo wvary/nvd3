@@ -51,8 +51,8 @@ nv.models.pie = function() {
                 , radius = Math.min(availableWidth, availableHeight) / 2
                 , arcsRadiusOuter = []
                 , arcsRadiusInner = []
+                , that = this
                 ;
-
             container = d3.select(this)
             if (arcsRadius.length === 0) {
                 var outer = radius - radius / 10;
@@ -295,23 +295,19 @@ nv.models.pie = function() {
                         Each label location is hashed, and if a hash collision occurs, we assume an overlap.
                         Adjust the label's y-position to remove the overlap.
                         */
-                        var center = labelsArc[i].centroid(d);
-                        var percent = getSlicePercentage(d);
-                        if (d.value && percent >= labelThreshold) {
-                            var hashKey = createHashKey(center);
-                            if (labelLocationHash[hashKey]) {
-                                center[1] -= avgHeight;
-                            }
-                            labelLocationHash[createHashKey(center)] = true;
-                        }
-                        return 'translate(' + center + ')'
+                        d.center = labelsArc[i].centroid(d);
+                        return 'translate(' + d.center + ')'
                     }
                 });
 
+                var prevDimension = undefined;
+                var measurementText;
+                var viewBoxWidth = that.farthestViewportElement.viewBox.baseVal.width;
                 pieLabels.select(".nv-label text")
                     .style('text-anchor', function(d,i) {
                         //center the text on it's origin or begin/end if orthogonal aligned
-                        return labelSunbeamLayout ? ((d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end') : 'middle';
+                        d.textAnchor = (d.startAngle + d.endAngle) / 2 < Math.PI ? 'start' : 'end';
+                        return d.textAnchor;
                     })
                     .text(function(d, i) {
                         var percent = getSlicePercentage(d);
@@ -337,7 +333,20 @@ nv.models.pie = function() {
                                     break;
                             }
                         }
-                        return label;
+                        var dimension = getTextBoundary(label, d.center, d.textAnchor);
+
+                        if (prevDimension) {
+                            if (rectanglesOverlapped(dimension, prevDimension)) {
+                                return '';
+                            } else {
+                                prevDimension = dimension;
+                            }
+                        } else {
+                            prevDimension = dimension;
+                        }
+                        var boundary = this.getBoundingClientRect();
+                        var width = viewBoxWidth / 2 - Math.abs(d.center[0]);
+                        return applyElipsis(label, width);
                     })
                 ;
 
@@ -377,9 +386,39 @@ nv.models.pie = function() {
                         })
                     ;
                 }
-
             }
 
+            function rectanglesOverlapped(rect1, rect2) {
+                // We'll test each corner to see if it is inside the order rectangle
+
+                function intersect(cx, cy, rect) {
+                    return (cx > rect.left && cx < rect.right && cy < rect.bottom && cy > rect.top);
+                }
+                      
+                if (intersect(rect1.left, rect1.top, rect2)) {
+                    return true;
+                }
+                if (intersect(rect1.right, rect1.top, rect2)) {
+                    return true;
+                }
+                if (intersect(rect1.right, rect1.bottom, rect2)) {
+                    return true;
+                }
+                if (intersect(rect1.left, rect1.bottom, rect2)) {
+                    return true;
+                }
+
+                if (intersect(rect2.left, rect2.top, rect1)) {
+                    return true;
+                }
+                if (intersect(rect2.right, rect2.top, rect1)) {
+                    return true;
+                }
+                if (intersect(rect2.right, rect2.bottom, rect1)) {
+                    return true;
+                }
+                return intersect(rect2.left, rect2.bottom, rect1);
+            }
 
             // Computes the angle of an arc, converting from radians to degrees.
             function angle(d) {
@@ -397,6 +436,66 @@ nv.models.pie = function() {
                     return arcs[idx](i(t));
                 };
             }
+
+            function getTextBoundary(text, point, anchor) {
+                var dimension = getTextSize(text);
+                if (anchor === 'start') {
+                    // point is at corner 4
+                    dimension.left = point[0];
+                    dimension.right = point[0] + dimension.width;
+                    dimension.top = point[1] - dimension.height;
+                    dimension.bottom = point[1];
+                } else {
+                    // point is at corner 3
+                    dimension.left = point[0] - dimension.width;
+                    dimension.right = point[0];
+                    dimension.top = point[1] - dimension.height;
+                    dimension.bottom = point[1];
+                }
+                return dimension;
+            }
+
+            function getTextSize(text) {
+                var result;
+
+                if (!measurementText) {
+                    measurementText = g.select('.measurement-text').select('text')[0][0];                
+                }
+                if (!measurementText) {
+                    result = g.append('g')
+                        .classed('measurement-text', true)
+                        .attr('transform', 'translate(100000,100000)')
+                        .append('text');
+                    measurementText = result[0][0];
+                }
+                measurementText.textContent = text;
+                var bbox = measurementText.getBBox();
+                return {
+                    width: bbox.width,
+                    height: bbox.height
+                };
+            }
+
+            function applyElipsis(text, width) {
+                if (!measurementText) {
+                    measurementText = g.select('.measurement-text').select('text')[0][0];                
+                }
+                if (!measurementText) {
+                    result = g.append('g')
+                        .classed('measurement-text', true)
+                        .attr('transform', 'translate(100000,100000)')
+                        .append('text');
+                    measurementText = result[0][0];
+                }
+
+                measurementText.textContent = text;
+                while(text != '' && measurementText.getComputedTextLength() > width) {
+                    text = text.substr(0, text.length - 1);
+                    measurementText.textContent = text + '...';
+                }
+                return measurementText.textContent;
+            }
+
         });
 
         renderWatch.renderEnd('pie immediate');

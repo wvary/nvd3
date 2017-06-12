@@ -49,7 +49,7 @@ nv.models.discreteBarChart = function() {
             return yAxis.tickFormat()(d, i);
         })
         .keyFormatter(function(d, i) {
-            return xAxis.tickFormat()(d, i);
+            return xAxis.tickFormat()(d);
         });
 
     //============================================================
@@ -149,6 +149,16 @@ nv.models.discreteBarChart = function() {
                 .attr('height', 16)
                 .attr('x', -x.rangeBand() / (staggerLabels ? 1 : 2 ));
 
+            // show values above the bar using format specified by client
+            if (discretebar.showValues()) {
+                container
+                    .selectAll('g.nv-bar')
+                    .selectAll('text')
+                    .text(function(d) {
+                        return (d && d.length > 1) ? yAxis.tickFormat()(d[1]) : '';
+                    });
+            }
+
             // Setup Axes
             if (showXAxis) {
                 xAxis
@@ -163,8 +173,9 @@ nv.models.discreteBarChart = function() {
                 var xTicks = g.select('.nv-x.nv-axis').selectAll('g');
                 if (staggerLabels) {
                     xTicks
+                        .selectAll('.tick')
                         .selectAll('text')
-                        .attr('transform', function(d,i,j) { return 'translate(0,' + (j % 2 == 0 ? '5' : '17') + ')' })
+                        .attr('transform', function(d,i,j) { return 'translate(0,' + (j % 2 == 0 ? '6' : '22') + ')' })
                 }
 
                 if (rotateLabels) {
