@@ -122,7 +122,7 @@ nv.models.bulletChart = function() {
             tickEnter.append('text')
                 .attr('text-anchor', 'middle')
                 .attr('dy', '1em')
-                .attr('y', availableHeight * 7 / 6)
+                .attr('y', (height - margin.bottom - 8))
                 .text(format);
 
             // Transition the updating ticks to the new scale, x1.
@@ -137,7 +137,7 @@ nv.models.bulletChart = function() {
                 .attr('y2', availableHeight * 7 / 6);
 
             tickUpdate.select('text')
-                .attr('y', availableHeight * 7 / 6);
+                .attr('y', (height - margin.bottom - 8));
 
             // Transition the exiting ticks to the new scale, x1.
             d3.transition(tick.exit())
@@ -146,6 +146,19 @@ nv.models.bulletChart = function() {
                 .attr('transform', function(d) { return 'translate(' + x1(d) + ',0)' })
                 .style('opacity', 1e-6)
                 .remove();
+
+            // only run the code below to udpate markers x positions
+            // if markers are greater than max range
+            var m  = +markerz.sort(function(a, b) { return b - a; })[0];
+            var r = +rangez[0];
+            if (m > r) {
+                d3.transition(g.selectAll('path.nv-markerTriangle'))
+                    .transition()
+                    .duration(bullet.duration())
+                    .attr('transform', function(d) {
+                        return 'translate(' + x1(+d.value) + ', ' + (availableHeight / 2) + ')';
+                    });
+            }
         });
 
         d3.timer.flush();
