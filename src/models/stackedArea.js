@@ -82,6 +82,12 @@ nv.models.stackedArea = function() {
                 .x(getX)
                 .y(getY)
                 .out(function(d, y0, y) {
+                    // TODO: Added object to array to prevent property form being dropped later
+                    //       Added by Willet until root cause is found and fixed
+                    d[2] = {
+                        y: y,
+                        y0: y0
+                    };
                     d.display = {
                         y: y,
                         y0: y0

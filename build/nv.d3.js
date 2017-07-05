@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.5-dev (https://github.com/novus/nvd3) 2017-07-04 */
+/* nvd3 version 1.8.5-dev (https://github.com/novus/nvd3) 2017-07-05 */
 (function(){
 
 // set up main nv object
@@ -14334,6 +14334,10 @@ nv.models.stackedArea = function() {
                 .x(getX)
                 .y(getY)
                 .out(function(d, y0, y) {
+                    d[2] = {
+                        y: y,
+                        y0: y0
+                    };
                     d.display = {
                         y: y,
                         y0: y0
@@ -15034,8 +15038,8 @@ nv.models.stackedAreaChart = function() {
                         //To handle situation where the stacked area chart is negative, we need to use absolute values
                         //when checking if the mouse Y value is within the stack area.
                         yValue = Math.abs(yValue);
-                        var stackedY0 = Math.abs(series.point.display.y0);
-                        var stackedY = Math.abs(series.point.display.y);
+                        var stackedY0 = Math.abs(series.point[2].y0);
+                        var stackedY = Math.abs(series.point[2].y);
                         if ( yValue >= stackedY0 && yValue <= (stackedY + stackedY0))
                         {
                             indexToHighlight = i;
