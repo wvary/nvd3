@@ -125,8 +125,8 @@ nv.models.bullet = function() {
 
             g.select('rect.nv-measure')
                 .style('fill', color)
-                .attr('height', availableHeight / 3)
-                .attr('y', availableHeight / 3)
+                .attr('height', availableHeight / 2)
+                .attr('y', availableHeight / 4)
                 .on('mouseover', function() {
                     dispatch.elementMouseover({
                         value: measurez[0],
@@ -155,7 +155,7 @@ nv.models.bullet = function() {
                     : x1(measurez[0]) - x1(0))
                 .attr('x', xp1(measurez));
 
-            var h3 =  availableHeight / 6;
+            var h3 =  availableHeight / 3.5;
 
             var markerData = markerz.map( function(marker, index) {
                 return {value: marker, label: markerLabelz[index]}
@@ -166,7 +166,7 @@ nv.models.bullet = function() {
               .enter()
               .append('path')
               .attr('class', 'nv-markerTriangle')
-              .attr('d', 'M0,' + h3 + 'L' + h3 + ',' + (-h3) + ' ' + (-h3) + ',' + (-h3) + 'Z')
+              .attr('d', 'M0,' + h3 + ' ' + (h3 * .4) + ',' + (-h3) + ' ' + (-h3 * .4) + ',' + (-h3) + 'Z')
               .on('mouseover', function(d) {
                 dispatch.elementMouseover({
                   value: d.value,
@@ -195,6 +195,7 @@ nv.models.bullet = function() {
               .data(markerData)
               .transition()
               .duration(duration)
+              .attr('d', 'M0,' + h3 + ' ' + (h3 * .4) + ',' + (-h3) + ' ' + (-h3 * .4) + ',' + (-h3) + 'Z')
               .attr('transform', function(d) { return 'translate(' + x1(d.value) + ',' + (availableHeight / 2) + ')' });
 
             var markerLinesData = markerLinez.map( function(marker, index) {
@@ -240,7 +241,8 @@ nv.models.bullet = function() {
               .transition()
               .duration(duration)
               .attr('x1', function(d) { return x1(d.value) })
-              .attr('x2', function(d) { return x1(d.value) });
+              .attr('x2', function(d) { return x1(d.value) })
+              .attr('y2', availableHeight - 2);
 
             wrap.selectAll('.nv-range')
                 .on('mouseover', function(d,i) {

@@ -442,17 +442,31 @@ nv.models.stackedAreaChart = function() {
 
                 allData.reverse();
 
-                //Highlight the tooltip entry based on which stack the mouse is closest to.
-                if (allData.length > 2) {
-                    var yValue = chart.yScale().invert(e.mouseY);
-                    var yDistMax = Infinity, indexToHighlight = null;
-                    allData.forEach(function(series,i) {
-
-                        //To handle situation where the stacked area chart is negative, we need to use absolute values
-                        //when checking if the mouse Y value is within the stack area.
-                        yValue = Math.abs(yValue);
-                        var stackedY0 = Math.abs(series.point.display.y0);
-                        var stackedY = Math.abs(series.point.display.y);
+                // TODO: Work around code by Willet
+                //       For some reason, the array elements do not retain custom properties.
+                //       Sot he series.y0 and series.y statements would throw an exception.
+                //       The code block below to to determine the series to highlight
+                //       if series count is between 2 and 100.
+                //       This code can be reverted back to the original code if the root cause
+                //       is fixed.
+                // Only attempt to highlight point if series count is between 2 and 100 (inclusive)
+                if (allData.length > 1 && allData.length < 101) {
+                    //To handle situation where the stacked area chart is negative, we need to use absolute values
+                    //when checking if the mouse Y value is within the stack area.
+                    var yValue = Math.abs(chart.yScale().invert(e.mouseY));
+                    var indexToHighlight = null;
+                    var points = [];
+                    var y0 = 0;
+                    for(var i = allData.length - 1; i >= 0; i--) {
+                      points.splice(0, 0, {
+                        y0: y0,
+                        y: allData[i].value
+                      });
+                      y0 += allData[i].value;
+                    }
+                    points.forEach(function(series,i) {
+                        var stackedY0 = Math.abs(series.y0);
+                        var stackedY = Math.abs(series.y);
                         if ( yValue >= stackedY0 && yValue <= (stackedY + stackedY0))
                         {
                             indexToHighlight = i;

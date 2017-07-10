@@ -276,7 +276,7 @@ nv.models.multiBarChart = function() {
                         return "translate(" + x + "," + y + ")";
                     };
 
-                    var staggerUp = 5, staggerDown = 17;  //pixels to stagger by
+                    var staggerUp = 2, staggerDown = 18;  //pixels to stagger by
                     // Issue #140
                     xTicks
                         .selectAll("text")

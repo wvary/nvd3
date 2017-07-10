@@ -122,7 +122,7 @@ nv.models.bulletChart = function() {
             tickEnter.append('text')
                 .attr('text-anchor', 'middle')
                 .attr('dy', '1em')
-                .attr('y', availableHeight * 7 / 6)
+                .attr('y', (height - margin.bottom - 8))
                 .text(format);
 
             // Transition the updating ticks to the new scale, x1.
@@ -137,7 +137,7 @@ nv.models.bulletChart = function() {
                 .attr('y2', availableHeight * 7 / 6);
 
             tickUpdate.select('text')
-                .attr('y', availableHeight * 7 / 6);
+                .attr('y', (height - margin.bottom - 8));
 
             // Transition the exiting ticks to the new scale, x1.
             d3.transition(tick.exit())
