@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.5-dev (https://github.com/novus/nvd3) 2017-07-10 */
+/* nvd3 version 1.8.5-dev (https://github.com/novus/nvd3) 2017-07-12 */
 (function(){
 
 // set up main nv object
@@ -2723,7 +2723,7 @@ nv.models.bullet = function() {
                     : x1(measurez[0]) - x1(0))
                 .attr('x', xp1(measurez));
 
-            var h3 =  availableHeight / 3.5;
+            var h3 =  availableHeight / 4;
 
             var markerData = markerz.map( function(marker, index) {
                 return {value: marker, label: markerLabelz[index]}
@@ -2734,7 +2734,7 @@ nv.models.bullet = function() {
               .enter()
               .append('path')
               .attr('class', 'nv-markerTriangle')
-              .attr('d', 'M0,' + h3 + ' ' + (h3 * .4) + ',' + (-h3) + ' ' + (-h3 * .4) + ',' + (-h3) + 'Z')
+              .attr('d', 'M0,' + (-h3 -2) + ' 6,' + (-h3 - 12) + ' -6,' + (-h3 - 12) + 'Z')
               .on('mouseover', function(d) {
                 dispatch.elementMouseover({
                   value: d.value,
@@ -2763,7 +2763,7 @@ nv.models.bullet = function() {
               .data(markerData)
               .transition()
               .duration(duration)
-              .attr('d', 'M0,' + h3 + ' ' + (h3 * .4) + ',' + (-h3) + ' ' + (-h3 * .4) + ',' + (-h3) + 'Z')
+              .attr('d', 'M0,' + (-h3 -2) + ' 6,' + (-h3 - 12) + ' -6,' + (-h3 - 12) + 'Z')
               .attr('transform', function(d) { return 'translate(' + x1(d.value) + ',' + (availableHeight / 2) + ')' });
 
             var markerLinesData = markerLinez.map( function(marker, index) {
