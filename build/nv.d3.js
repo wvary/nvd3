@@ -2684,11 +2684,9 @@ nv.models.bullet = function() {
                 var range = rangez[i];
                 g.select('rect.nv-range'+i)
                     .datum(range)
-                    .transition()
-                    .duration(duration / 4)
                     .attr('height', availableHeight / 2)
                     .transition()
-                    .duration(duration)
+                    .duration(duration / 4)
                     .attr('width', w1(range))
                     .attr('x', xp1(range))
                     .attr('y', availableHeight / 4)
@@ -3014,7 +3012,6 @@ nv.models.bulletChart = function() {
 
             // Transition the updating ticks to the new scale, x1.
             var tickUpdate = d3.transition(tick)
-                .transition()
                 .duration(bullet.duration() / 4)
                 .attr('transform', function(d) { return 'translate(' + x1(d) + ',0)' })
                 .style('opacity', 1);
@@ -3028,7 +3025,6 @@ nv.models.bulletChart = function() {
 
             // Transition the exiting ticks to the new scale, x1.
             d3.transition(tick.exit())
-                .transition()
                 .duration(bullet.duration() / 4)
                 .attr('transform', function(d) { return 'translate(' + x1(d) + ',0)' })
                 .style('opacity', 1e-6)
