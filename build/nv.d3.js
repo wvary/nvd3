@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.5-dev (https://github.com/novus/nvd3) 2017-07-12 */
+/* nvd3 version 1.8.5-dev (https://github.com/novus/nvd3) 2017-07-13 */
 (function(){
 
 // set up main nv object
@@ -2684,17 +2684,18 @@ nv.models.bullet = function() {
                 var range = rangez[i];
                 g.select('rect.nv-range'+i)
                     .datum(range)
-                    .attr('height', availableHeight)
+                    .transition()
+                    .duration(duration / 4)
+                    .attr('height', availableHeight / 2)
                     .transition()
                     .duration(duration)
                     .attr('width', w1(range))
                     .attr('x', xp1(range))
+                    .attr('y', availableHeight / 4)
             }
 
             g.select('rect.nv-measure')
                 .style('fill', color)
-                .attr('height', availableHeight / 2)
-                .attr('y', availableHeight / 4)
                 .on('mouseover', function() {
                     dispatch.elementMouseover({
                         value: measurez[0],
@@ -2716,6 +2717,10 @@ nv.models.bullet = function() {
                         color: d3.select(this).style("fill")
                     })
                 })
+                .transition()
+                .duration(duration / 4)
+                .attr('height', availableHeight / 2)
+                .attr('y', availableHeight / 4)
                 .transition()
                 .duration(duration)
                 .attr('width', measurez < 0 ?
@@ -2762,7 +2767,7 @@ nv.models.bullet = function() {
             g.selectAll("path.nv-markerTriangle")
               .data(markerData)
               .transition()
-              .duration(duration)
+              .duration(duration / 4)
               .attr('d', 'M0,' + (-h3 -2) + ' 6,' + (-h3 - 12) + ' -6,' + (-h3 - 12) + 'Z')
               .attr('transform', function(d) { return 'translate(' + x1(d.value) + ',' + (availableHeight / 2) + ')' });
 
@@ -2807,7 +2812,7 @@ nv.models.bullet = function() {
             g.selectAll("line.nv-markerLine")
               .data(markerLinesData)
               .transition()
-              .duration(duration)
+              .duration(duration / 4)
               .attr('x1', function(d) { return x1(d.value) })
               .attr('x2', function(d) { return x1(d.value) })
               .attr('y2', availableHeight - 2);
@@ -3010,7 +3015,7 @@ nv.models.bulletChart = function() {
             // Transition the updating ticks to the new scale, x1.
             var tickUpdate = d3.transition(tick)
                 .transition()
-                .duration(bullet.duration())
+                .duration(bullet.duration() / 4)
                 .attr('transform', function(d) { return 'translate(' + x1(d) + ',0)' })
                 .style('opacity', 1);
 
@@ -3024,7 +3029,7 @@ nv.models.bulletChart = function() {
             // Transition the exiting ticks to the new scale, x1.
             d3.transition(tick.exit())
                 .transition()
-                .duration(bullet.duration())
+                .duration(bullet.duration() / 4)
                 .attr('transform', function(d) { return 'translate(' + x1(d) + ',0)' })
                 .style('opacity', 1e-6)
                 .remove();

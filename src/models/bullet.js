@@ -116,17 +116,16 @@ nv.models.bullet = function() {
                 var range = rangez[i];
                 g.select('rect.nv-range'+i)
                     .datum(range)
-                    .attr('height', availableHeight)
+                    .attr('height', availableHeight / 2)
                     .transition()
-                    .duration(duration)
+                    .duration(duration / 4)
                     .attr('width', w1(range))
                     .attr('x', xp1(range))
+                    .attr('y', availableHeight / 4)
             }
 
             g.select('rect.nv-measure')
                 .style('fill', color)
-                .attr('height', availableHeight / 2)
-                .attr('y', availableHeight / 4)
                 .on('mouseover', function() {
                     dispatch.elementMouseover({
                         value: measurez[0],
@@ -148,6 +147,10 @@ nv.models.bullet = function() {
                         color: d3.select(this).style("fill")
                     })
                 })
+                .transition()
+                .duration(duration / 4)
+                .attr('height', availableHeight / 2)
+                .attr('y', availableHeight / 4)
                 .transition()
                 .duration(duration)
                 .attr('width', measurez < 0 ?
@@ -194,7 +197,7 @@ nv.models.bullet = function() {
             g.selectAll("path.nv-markerTriangle")
               .data(markerData)
               .transition()
-              .duration(duration)
+              .duration(duration / 4)
               .attr('d', 'M0,' + (-h3 -2) + ' 6,' + (-h3 - 12) + ' -6,' + (-h3 - 12) + 'Z')
               .attr('transform', function(d) { return 'translate(' + x1(d.value) + ',' + (availableHeight / 2) + ')' });
 
@@ -239,7 +242,7 @@ nv.models.bullet = function() {
             g.selectAll("line.nv-markerLine")
               .data(markerLinesData)
               .transition()
-              .duration(duration)
+              .duration(duration / 4)
               .attr('x1', function(d) { return x1(d.value) })
               .attr('x2', function(d) { return x1(d.value) })
               .attr('y2', availableHeight - 2);
