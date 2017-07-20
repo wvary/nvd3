@@ -1,4 +1,4 @@
-/* nvd3 version 1.8.5-dev (https://github.com/novus/nvd3) 2017-07-13 */
+/* nvd3 version 1.8.5-dev (https://github.com/novus/nvd3) 2017-07-19 */
 (function(){
 
 // set up main nv object
@@ -14399,6 +14399,9 @@ nv.models.stackedArea = function() {
                     return zeroArea(d.values, d.seriesIndex);
                 })
                 .on('mouseover', function(d,i) {
+                    // TODO: Workaround by Willet
+                    //       Set the series to be highlighted if necessary
+                    d.highlight = true;
                     d3.select(this).classed('hover', true);
                     dispatch.areaMouseover({
                         point: d,
@@ -14408,6 +14411,9 @@ nv.models.stackedArea = function() {
                     });
                 })
                 .on('mouseout', function(d,i) {
+                    // TODO: Workaround by Willet
+                    //       Remove the flag to highlight this series
+                    delete d.highlight;
                     d3.select(this).classed('hover', false);
                     dispatch.areaMouseout({
                         point: d,
@@ -14997,12 +15003,16 @@ nv.models.stackedAreaChart = function() {
                         if (typeof pointXLocation === 'undefined') pointXLocation = chart.xScale()(chart.x()(point,pointIndex));
 
                         //If we are in 'expand' mode, use the stacked percent value instead of raw value.
-                        var tooltipValue = (stacked.style() == 'expand') ? point.display.y : chart.y()(point,pointIndex);
+                        var tooltipValue = chart.y()(point,pointIndex);
                         allData.push({
                             key: series.key,
                             value: tooltipValue,
                             color: color(series,series.seriesIndex),
-                            point: point
+                            point: point,
+                            // TODO: Workaround by Willet
+                            //       The mouseover/mouseout sets this property in the nv.models.stackedArea module
+                            //       We can use this value and skip the code below which causes the javascript error
+                            highlight: !!series.highlight
                         });
 
                         if (showTotalInTooltip && stacked.style() != 'expand' && tooltipValue != null) {
@@ -15014,38 +15024,28 @@ nv.models.stackedAreaChart = function() {
                 allData.reverse();
 
                 // TODO: Work around code by Willet
-                //       For some reason, the array elements do not retain custom properties.
-                //       Sot he series.y0 and series.y statements would throw an exception.
-                //       The code block below to to determine the series to highlight
-                //       if series count is between 2 and 100.
-                //       This code can be reverted back to the original code if the root cause
-                //       is fixed.
-                // Only attempt to highlight point if series count is between 2 and 100 (inclusive)
-                if (allData.length > 1 && allData.length < 101) {
-                    //To handle situation where the stacked area chart is negative, we need to use absolute values
-                    //when checking if the mouse Y value is within the stack area.
-                    var yValue = Math.abs(chart.yScale().invert(e.mouseY));
-                    var indexToHighlight = null;
-                    var points = [];
-                    var y0 = 0;
-                    for(var i = allData.length - 1; i >= 0; i--) {
-                      points.splice(0, 0, {
-                        y0: y0,
-                        y: allData[i].value
-                      });
-                      y0 += allData[i].value;
-                    }
-                    points.forEach(function(series,i) {
-                        var stackedY0 = Math.abs(series.y0);
-                        var stackedY = Math.abs(series.y);
-                        if ( yValue >= stackedY0 && yValue <= (stackedY + stackedY0))
-                        {
-                            indexToHighlight = i;
-                            return;
-                        }
+                //       There is a javascript error in showing the tooltip when chart is in Expanded mode.
+                //       The workaround is to change the above line from:
+                //         var tooltipValue = (stacked.style() == 'expand') ? point.display.y : chart.y()(point,pointIndex);
+                //       to:
+                //         var tooltipValue = chart.y()(point,pointIndex);
+                //       However, in doing so, the values are not in percentage format
+                //       Need to convert all values to percentage.
+                if (stacked.style() === 'expand') {
+                    var total = _.sum(allData.map(function(v) {
+                                  return v.value
+                                }));
+                    allData.forEach(function(v) {
+                        v.value /= total;
                     });
-                    if (indexToHighlight != null)
-                        allData[indexToHighlight].highlight = true;
+                }
+
+                // TODO: Work around by Willet
+                //       Since we blindly set the series as highlight when the user mouseover,
+                //       let's determine if we need to highlight.
+                //       Turn off highlight if there is only one series
+                if (allData.length === 1) {
+                    delete allData[0].highlight;
                 }
 
                 //If we are not in 'expand' mode, add a 'Total' row to the tooltip.

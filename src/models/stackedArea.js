@@ -159,6 +159,9 @@ nv.models.stackedArea = function() {
                     return zeroArea(d.values, d.seriesIndex);
                 })
                 .on('mouseover', function(d,i) {
+                    // TODO: Workaround by Willet
+                    //       Set the series to be highlighted if necessary
+                    d.highlight = true;
                     d3.select(this).classed('hover', true);
                     dispatch.areaMouseover({
                         point: d,
@@ -168,6 +171,9 @@ nv.models.stackedArea = function() {
                     });
                 })
                 .on('mouseout', function(d,i) {
+                    // TODO: Workaround by Willet
+                    //       Remove the flag to highlight this series
+                    delete d.highlight;
                     d3.select(this).classed('hover', false);
                     dispatch.areaMouseout({
                         point: d,
